@@ -7,12 +7,28 @@ from pathlib import Path
 from .separate import separate_stems
 from .enhance import enhance_vocals
 from .transcribe import transcribe_audio
+from .analyze import analyze_recording, diagnose_vocal_presence, format_report
 
 def cover_pipeline(args):
     """Run the full cover generation pipeline."""
     print("=" * 60)
     print("SongForge — Cover Pipeline")
     print("=" * 60)
+    
+    # Step 0: Spectral precheck
+    print("\n[0/5] Running spectral precheck...")
+    report = analyze_recording(args.input)
+    diagnosis = diagnose_vocal_presence(report)
+    print(format_report(report, diagnosis))
+    
+    if diagnosis["recommendation"] == "skip_separation" and not getattr(args, "force", False):
+        print("\n⚠️  Separation skipped — vocals below noise floor.")
+        print("  Use --force to attempt separation anyway.")
+        print("  Proceeding directly to lyric-matched generation...\n")
+        # Skip to generation with known lyrics
+        cover_file = _generate_cover(args.style, args.lyrics, args.output)
+        print(f"\n✅ Cover complete: {cover_file}")
+        return cover_file
     
     # Step 1: Separate
     print("\n[1/5] Separating stems...")

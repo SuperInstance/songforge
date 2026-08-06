@@ -23,6 +23,7 @@ def main():
     cover.add_argument("--style", "-s", default="acoustic folk, warm vocals", help="Musical style prompt")
     cover.add_argument("--output", "-o", default="cover.mp3", help="Output file")
     cover.add_argument("--keep-stems", action="store_true", help="Keep intermediate files")
+    cover.add_argument("--force", action="store_true", help="Force separation even if precheck warns")
     
     # Separate command
     sep = subparsers.add_parser("separate", help="Separate vocals from instruments")
@@ -36,6 +37,11 @@ def main():
     trans.add_argument("--model", "-m", default="small")
     trans.add_argument("--compare", "-c", help="Compare against known lyrics file")
     
+    # Analyze command
+    ana = subparsers.add_parser("analyze", help="Spectral precheck — diagnose recording before separation")
+    ana.add_argument("--input", "-i", required=True, help="Input audio file")
+    ana.add_argument("--duration", "-d", type=float, default=30.0, help="Seconds to analyze (default 30)")
+    
     # Enhance command
     enh = subparsers.add_parser("enhance", help="Enhance vocal quality")
     enh.add_argument("--input", "-i", required=True)
@@ -48,6 +54,11 @@ def main():
     if args.command == "cover":
         from .pipeline import cover_pipeline
         cover_pipeline(args)
+    elif args.command == "analyze":
+        from .analyze import analyze_recording, diagnose_vocal_presence, format_report
+        report = analyze_recording(args.input, segment_duration=args.duration)
+        diagnosis = diagnose_vocal_presence(report)
+        print(format_report(report, diagnosis))
     elif args.command == "separate":
         from .separate import separate_stems
         separate_stems(args.input, args.output_dir, args.model)
