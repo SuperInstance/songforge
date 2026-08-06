@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "songforge"
+version = "0.1.0"
+description = "AI-powered song cover generation from imperfect source recordings"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = [
+    "demucs>=4.1.0",
+    "librosa>=0.10.0",
+    "pydub>=0.25.1",
+    "openai-whisper>=20231117",
+    "soundfile>=0.12.0",
+]
+
+[project.scripts]
+songforge = "songforge.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
