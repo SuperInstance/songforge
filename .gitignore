@@ -8,3 +8,5 @@ dist/
 stems/
 *.wav
 *.mp3
+# Prevent MagicMock directory pollution from test runs
+<MagicMock*
