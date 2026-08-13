@@ -1,0 +1,9 @@
+{
+  "name": "baroque-techno",
+  "prompt": "Baroque classical meets Detroit techno. Harpsichord and violin interweave with Roland TB-303 acid lines. 128 BPM, 4/4 time. Fugue-like melodic development over pounding four-on-the-floor kick. Period-appropriate counterpoint meets warehouse rave energy.",
+  "genre": "baroque techno",
+  "instruments": "harpsichord, violin, TB-303 synth, 909 drums",
+  "bpm": 128,
+  "key": "D minor",
+  "mood": "dark, intellectual, energetic"
+}
