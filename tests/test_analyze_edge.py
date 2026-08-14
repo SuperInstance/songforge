@@ -311,3 +311,58 @@ class TestAnalyzeRecording:
             assert report.spectral_centroid_hz == 1000.0
         finally:
             os.unlink(tmp.name)
+
+
+# ─── Spectral feature computation (real measurements) ───
+
+import subprocess as _sp
+import tempfile as _tf
+import os as _os
+
+def _sine_wav(freq_hz: int, seconds: float = 2.0) -> str:
+    """Render a synthetic sine tone to a temp wav and return its path."""
+    tmp = _tf.NamedTemporaryFile(suffix=".wav", delete=False)
+    tmp.close()
+    _sp.run([
+        "ffmpeg", "-y", "-f", "lavfi",
+        "-i", f"sine=frequency={freq_hz}:duration={seconds}",
+        "-ar", "44100", "-ac", "1", tmp.name
+    ], capture_output=True, text=True)
+    return tmp.name
+
+
+class TestSpectralFeaturesReal:
+    """Spectral features are measured from samples, not parsed from thin air.
+
+    Regression guard: the old implementation parsed ffmpeg astats output for
+    centroid/rolloff/flatness/flux — fields astats never emits — so the
+    report silently reported 0.0 for every file. A pure tone must now yield
+    a centroid near its frequency, and silence must degrade to zeros (not
+    crash).
+    """
+
+    def test_pure_tone_centroid_tracks_frequency(self):
+        path = _sine_wav(440)
+        try:
+            centroid, rolloff, flatness, flux = _compute_spectral_centroid(path)
+            assert 380 < centroid < 520, f"centroid {centroid} should be near 440 Hz"
+            assert 380 < rolloff < 520, f"rolloff {rolloff} should be near 440 Hz"
+            assert 0.0 <= flatness <= 0.05, f"pure tone should be tonal (flatness {flatness})"
+            assert flux < 0.05, f"steady tone should have low flux ({flux})"
+        finally:
+            _os.unlink(path)
+
+    def test_high_tone_centroid_scales(self):
+        path = _sine_wav(2000)
+        try:
+            centroid, _, _, _ = _compute_spectral_centroid(path)
+            assert 1800 < centroid < 2400, f"centroid {centroid} should scale with 2 kHz"
+        finally:
+            _os.unlink(path)
+
+    def test_silence_returns_zeros_not_crash(self):
+        path = _sine_wav(0, seconds=1.0)  # 0 Hz sine == silence
+        try:
+            assert _compute_spectral_centroid(path) == (0.0, 0.0, 0.0, 0.0)
+        finally:
+            _os.unlink(path)

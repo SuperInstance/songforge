@@ -174,55 +174,73 @@ def _compute_band_energies(wav_file: str) -> list[BandEnergy]:
 
 
 def _compute_spectral_centroid(wav_file: str) -> tuple[float, float, float, float]:
-    """Compute spectral centroid, rolloff, flatness, and flux.
-    
-    Uses ffmpeg's astats and astats metadata to extract spectral features.
-    Falls back to estimated values if filters unavailable.
+    """Compute spectral centroid, rolloff, flatness, and flux from audio.
+
+    These are measured directly from the samples via a short-time Fourier
+    transform (numpy FFT over Hann-windowed frames). ffmpeg's astats filter
+    is time-domain only and never emits these values — parsing its output
+    for them silently returned zeros, so we compute them ourselves.
+
+    Returns:
+        (centroid_hz, rolloff_85_hz, flatness, flux) — zeros for empty or
+        silent audio rather than raising, so the report can still render.
     """
-    # Spectral centroid via ffmpeg
-    # We use the astats filter which provides frequency-domain stats
-    result = subprocess.run([
-        "ffmpeg", "-y", "-i", wav_file,
-        "-af", "astats=metadata=1:reset=0,"
-               f"asetnsamples=n=1024:p=0",
-        "-f", "null", "-"
-    ], capture_output=True, text=True)
-    
-    # Parse what we can from astats
-    centroid = 0.0
-    flatness = 0.0
-    flux = 0.0
-    rolloff = 0.0
-    
-    for line in result.stderr.split('\n'):
-        line_lower = line.strip().lower()
-        if "centroid" in line_lower and "=" in line:
-            try:
-                centroid = float(line.split("=")[1].strip())
-            except (ValueError, IndexError):
-                pass
-        if "flatness" in line_lower and "=" in line:
-            try:
-                flatness = float(line.split("=")[1].strip())
-            except (ValueError, IndexError):
-                pass
-        if "flux" in line_lower and "=" in line:
-            try:
-                flux = float(line.split("=")[1].strip())
-            except (ValueError, IndexError):
-                pass
-        if "rolloff" in line_lower and "=" in line:
-            try:
-                rolloff = float(line.split("=")[1].strip())
-            except (ValueError, IndexError):
-                pass
-    
-    # Fallback: estimate centroid from band energies if not parsed
-    # (This is approximate but better than nothing)
-    if centroid == 0.0:
-        return (centroid, rolloff, flatness, flux)
-    
-    return (centroid, rolloff, flatness, flux)
+    try:
+        import numpy as np
+        import soundfile as sf
+    except ImportError:
+        return (0.0, 0.0, 0.0, 0.0)
+
+    try:
+        data, sr = sf.read(wav_file, dtype="float32", always_2d=True)
+        samples = data[:, 0]  # mono extraction already happened, take first channel
+    except Exception:
+        return (0.0, 0.0, 0.0, 0.0)
+
+    if len(samples) < 1024:
+        return (0.0, 0.0, 0.0, 0.0)
+
+    # Short-time Fourier transform: Hann-windowed frames, 50% overlap.
+    frame = 1024
+    hop = frame // 2
+    win = np.hanning(frame)
+    n_frames = 1 + (len(samples) - frame) // hop
+    freqs = np.fft.rfftfreq(frame, 1.0 / sr)
+
+    mags = np.empty((n_frames, len(freqs)), dtype=np.float64)
+    for i in range(n_frames):
+        seg = samples[i * hop:i * hop + frame] * win
+        mags[i] = np.abs(np.fft.rfft(seg))
+
+    # Mean magnitude spectrum across frames (perceptual smoothing)
+    spec = mags.mean(axis=0)
+    total_energy = spec.sum()
+    if total_energy <= 0:
+        return (0.0, 0.0, 0.0, 0.0)
+
+    # Centroid: energy-weighted mean frequency
+    centroid = float((spec * freqs).sum() / total_energy)
+
+    # Rolloff: frequency below which 85% of spectral energy sits
+    cumulative = np.cumsum(spec)
+    idx = int(np.searchsorted(cumulative, 0.85 * total_energy))
+    rolloff = float(freqs[min(idx, len(freqs) - 1)])
+
+    # Flatness: geometric mean / arithmetic mean of magnitudes (0..1,
+    # 0 = noise-like, 1 = tonal). Add epsilon to keep silent bins from
+    # zeroing the geometric mean.
+    eps = 1e-12
+    geom = np.exp(np.mean(np.log(spec + eps)))
+    arith = np.mean(spec + eps)
+    flatness = float(geom / arith) if arith > 0 else 0.0
+
+    # Flux: mean frame-to-frame L2 change in the magnitude spectrum
+    if n_frames > 1:
+        flux = float(np.linalg.norm(np.diff(mags, axis=0)) / (n_frames - 1))
+    else:
+        flux = 0.0
+
+    return (round(centroid, 1), round(rolloff, 1), round(flatness, 4), round(flux, 4))
 
 
 def analyze_recording(input_file: str, segment_duration: float = 30.0) -> SpectralReport:
