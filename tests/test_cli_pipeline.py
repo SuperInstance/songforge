@@ -284,14 +284,16 @@ class TestCoverPipeline:
         # Force should cause separation to proceed despite skip recommendation
         mock_separate.assert_called_once()
 
+    @patch("songforge.pipeline._generate_cover")
     @patch("songforge.pipeline.format_report")
     @patch("songforge.pipeline.diagnose_vocal_presence")
     @patch("songforge.pipeline.analyze_recording")
-    def test_pipeline_analyze_called_with_input(self, mock_analyze, mock_diagnose, mock_format):
+    def test_pipeline_analyze_called_with_input(self, mock_analyze, mock_diagnose, mock_format, mock_cover):
         """Verify analyze_recording is called with the input file."""
         mock_analyze.return_value = {}
         mock_diagnose.return_value = {"recommendation": "skip_separation"}
         mock_format.return_value = ""
+        mock_cover.return_value = "cover.mp3"
 
         args = self._make_args(input="custom.mp3")
         cover_pipeline(args)
@@ -459,13 +461,15 @@ class TestMixTracks:
     """Test the ffmpeg mixing helper."""
 
     @patch("songforge.pipeline.subprocess.run")
-    def test_mix_tracks_basic(self, mock_run):
+    def test_mix_tracks_basic(self, mock_run, tmp_path):
         """Verify ffmpeg is called with correct arguments."""
         mock_run.return_value = MagicMock(returncode=0)
+        out = str(tmp_path / "mixed.mp3")
+        (tmp_path / "mixed.mp3").write_bytes(b"data")
 
-        result = _mix_tracks("vocals.wav", "instrumental.wav", "mixed.mp3")
+        result = _mix_tracks("vocals.wav", "instrumental.wav", out)
 
-        assert result == "mixed.mp3"
+        assert result == out
         cmd = mock_run.call_args_list[0][0][0]
         assert "ffmpeg" in cmd
         assert "-y" in cmd
@@ -474,18 +478,23 @@ class TestMixTracks:
         assert "amix" in str(cmd)
 
     @patch("songforge.pipeline.subprocess.run")
-    def test_mix_tracks_captures_output(self, mock_run):
+    def test_mix_tracks_captures_output(self, mock_run, tmp_path):
+        """Verify subprocess uses capture_output=True."""
         mock_run.return_value = MagicMock(returncode=0)
-        _mix_tracks("v.wav", "i.wav", "out.mp3")
+        out = str(tmp_path / "out.mp3")
+        (tmp_path / "out.mp3").write_bytes(b"data")
+        _mix_tracks("v.wav", "i.wav", out)
         kwargs = mock_run.call_args_list[0][1]
         assert kwargs.get("capture_output") is True
         assert kwargs.get("text") is True
 
     @patch("songforge.pipeline.subprocess.run")
-    def test_mix_tracks_filter_complex(self, mock_run):
+    def test_mix_tracks_filter_complex(self, mock_run, tmp_path):
         """Verify amix filter is in the command."""
         mock_run.return_value = MagicMock(returncode=0)
-        _mix_tracks("a.wav", "b.wav", "c.mp3")
+        out = str(tmp_path / "c.mp3")
+        (tmp_path / "c.mp3").write_bytes(b"data")
+        _mix_tracks("a.wav", "b.wav", out)
         cmd = mock_run.call_args_list[0][0][0]
         # The filter_complex should mention amix with inputs=2
         filter_idx = cmd.index("-filter_complex")
@@ -494,14 +503,30 @@ class TestMixTracks:
         assert "inputs=2" in filter_value
 
     @patch("songforge.pipeline.subprocess.run")
-    def test_mix_tracks_duration_longest(self, mock_run):
+    def test_mix_tracks_duration_longest(self, mock_run, tmp_path):
         """Verify amix uses duration=longest."""
         mock_run.return_value = MagicMock(returncode=0)
-        _mix_tracks("a.wav", "b.wav", "c.mp3")
+        out = str(tmp_path / "c.mp3")
+        (tmp_path / "c.mp3").write_bytes(b"data")
+        _mix_tracks("a.wav", "b.wav", out)
         cmd = mock_run.call_args_list[0][0][0]
         filter_idx = cmd.index("-filter_complex")
         filter_value = cmd[filter_idx + 1]
         assert "duration=longest" in filter_value
+
+    @patch("songforge.pipeline.subprocess.run")
+    def test_mix_tracks_raises_on_ffmpeg_failure(self, mock_run, tmp_path):
+        """A failing ffmpeg must raise, not return a phantom path."""
+        mock_run.return_value = MagicMock(returncode=1, stderr="boom\n")
+        with pytest.raises(RuntimeError, match="ffmpeg mix failed"):
+            _mix_tracks("v.wav", "i.wav", str(tmp_path / "out.mp3"))
+
+    @patch("songforge.pipeline.subprocess.run")
+    def test_mix_tracks_raises_when_output_missing(self, mock_run, tmp_path):
+        """Success exit code but no output file is still a failure."""
+        mock_run.return_value = MagicMock(returncode=0)
+        with pytest.raises(RuntimeError, match="no file"):
+            _mix_tracks("v.wav", "i.wav", str(tmp_path / "ghost.mp3"))
 
 
 # ─── Pipeline: Edge Cases ───
