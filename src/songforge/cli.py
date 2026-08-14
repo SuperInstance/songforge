@@ -46,7 +46,8 @@ def main():
     enh = subparsers.add_parser("enhance", help="Enhance vocal quality")
     enh.add_argument("--input", "-i", required=True)
     enh.add_argument("--output", "-o", default="enhanced.wav")
-    enh.add_argument("--volume", type=float, default=3.0)
+    enh.add_argument("--volume", type=float, default=3.0, help="Volume boost in dB")
+    enh.add_argument("--eq-freq", type=int, default=2000, help="EQ boost center frequency in Hz")
     enh.add_argument("--denoise", action="store_true")
     
     args = parser.parse_args()
@@ -67,7 +68,7 @@ def main():
         transcribe_audio(args.input, args.model, args.compare)
     elif args.command == "enhance":
         from .enhance import enhance_vocals
-        enhance_vocals(args.input, args.output, args.volume, args.denoise)
+        enhance_vocals(args.input, args.output, args.volume, args.eq_freq, args.denoise)
     else:
         parser.print_help()
         sys.exit(1)

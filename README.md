@@ -29,6 +29,15 @@ python -m songforge separate --input song.mp3 --output-dir stems/
 
 # Just transcribe
 python -m songforge transcribe --input vocals.wav
+
+# Compare transcription against known lyrics (for cover verification)
+python -m songforge transcribe --input vocals.wav --compare lyrics.txt
+
+# Spectral precheck — diagnose a recording BEFORE separation
+python -m songforge analyze --input song.mp3
+
+# Enhance vocal quality (volume, EQ, optional de-noise)
+python -m songforge enhance --input vocals.wav --output enhanced.wav --volume 3.0 --eq-freq 2000 --denoise
 ```
 
 ## Requirements
