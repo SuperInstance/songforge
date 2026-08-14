@@ -1,0 +1,9 @@
+{
+  "name": "Klezmer-Country Fusion",
+  "description": "Banjo-guitar duo accompanied by brass section, clarinet, and percussion for a rootsy Americana-inspired sound",
+  "bpm": 95,
+  "key": "D minor",
+  "instruments": ["clarinet", "trumpet", "trombone", "banjo", "acoustic_guitar", "snare_drum"],
+  "production": "live room recording, natural reverb",
+  "duration_target": "3:30"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Punk Jive Hip-Hop Fusion",
+  "description": "Live drum machines, aggressive percussion, and guitar chords with minimal effects processing for a raw, high-energy sound",
+  "bpm": 140,
+  "key": "E minor",
+  "instruments": ["distorted_guitar", "808_drums", "turntable", "bass_guitar", "shout_vocals"],
+  "production": "garage recording, raw and unprocessed",
+  "duration_target": "2:30"
+}

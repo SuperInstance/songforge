@@ -1,0 +1,9 @@
+{
+  "name": "Folk-Techno Fusion",
+  "description": "Live guitar and mandolin patterns with hand drums, analog synths, and subtle effects processing for a balanced mix of warmth and clarity",
+  "bpm": 120,
+  "key": "A minor",
+  "instruments": ["mandolin", "acoustic_guitar", "hand_drums", "analog_synth", "field_recordings"],
+  "production": "organic meets electronic, layered textures",
+  "duration_target": "4:00"
+}

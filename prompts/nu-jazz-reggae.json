@@ -1,0 +1,9 @@
+{
+  "name": "Nu-Jazz Reggae Fusion",
+  "description": "Live jazz ensemble elements with traditional reggae percussion, guitar chords, and a soulful organ section",
+  "bpm": 85,
+  "key": "F minor",
+  "instruments": ["tenor_sax", "trumpet", "upright_bass", "hammond_organ", "reggae_drums", "skank_guitar"],
+  "production": "warm analog recording with dub echoes",
+  "duration_target": "4:00"
+}

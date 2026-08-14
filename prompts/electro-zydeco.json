@@ -1,0 +1,9 @@
+{
+  "name": "Electro-Zydeco Fusion",
+  "description": "Driving accordion riff paired with live percussion and steel drums, blending vintage effects with modern electronic beats",
+  "bpm": 110,
+  "key": "G major",
+  "instruments": ["accordion", "steel_drums", "electronic_drums", "washboard", "bass_synth"],
+  "production": "vintage warmth meets digital clarity",
+  "duration_target": "3:00"
+}
