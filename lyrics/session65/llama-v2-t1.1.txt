@@ -1,0 +1,76 @@
+Here's a song I came up with, where each voice passes the lyrics to the next voice in a nested structure.
+
+**Verse 1**
+
+Singer (4-voice) - High
+Lead Vocalist (2-voice) - Upper/Middle
+Main Voice (1-voice) - Main Vocal
+Solo Voice (1-voice) - Solo
+
+High Lead Main Solo 
+Line 1: In the stillness, I hear your voice so clear 
+Lead Lower Main Lower 
+Line 2: Whispering secrets, in my ear 
+Vocal Upper Lower Lower 
+Line 3: A gentle breeze that brings me near 
+Main Vocal Lower Lower 
+Line 4: To a place where love and hope reside 
+
+**Verse 2**
+
+Singer (4-voice) - Low
+Lead Vocalist (2-voice) - Middle/Lower
+Main Voice (1-voice) - Main
+Solo Voice (1-voice) - Solo
+
+Low Lead Lower Lower 
+Line 5: In the silence, I feel your pain 
+Middle Upper Lower Lower 
+Line 6: A heartache that echoes through my brain 
+Lower Main Vocal 
+Line 7: A longing that cannot be explained 
+Solo 
+
+**Chorus**
+
+Singer (4-voice) - High
+Lead Vocalist (2-voice) - Upper/Middle
+Main Voice (1-voice) - Main Vocal
+Solo Voice (1-voice) - Solo
+
+High Lead Main Lower 
+Line 8: Oh, I'm searching for a way to be with you 
+Upper Middle Vocal Lower 
+Line 9: To find my heart beating anew 
+Vocal Upper Lower Lower 
+Line 10: In your eyes, my soul finds a home 
+
+**Verse 3**
+
+Singer (4-voice) - Low
+Lead Vocalist (2-voice) - Middle/Lower
+Main Voice (1-voice) - Main
+Solo Voice (1-voice) - Solo
+
+Low Lead Lower Lower 
+Line 11: I'll follow the path where love will lead 
+Middle Upper Lower Lower 
+Line 12: Through trials and through heartache's creed 
+Lower Main Vocal 
+Line 13: To find the strength to face my fears 
+
+**Chorus**
+
+Singer (4-voice) - High
+Lead Vocalist (2-voice) - Upper/Middle
+Main Voice (1-voice) - Main Vocal
+Solo Voice (1-voice) - Solo
+
+High Lead Main Lower 
+Line 14: And I'll find my way, through the darkest night 
+Upper Middle Vocal Lower 
+Line 15: To a place where love shines with all its might 
+Vocal Upper Lower Lower 
+Line 16: Where hearts beat as one, in perfect harmony 
+
+This song is meant to be sung continuously, twice over. The different scales create a layered effect that builds upon itself and creates a sense of depth and continuity.

@@ -1,0 +1,1 @@
+Write song lyrics. Four voices pass a line of song from one to the next like a baton. Each voice is itself a chain of four smaller voices passing a smaller line. Only one voice sings at a time, at every scale. The song is not louder — it is continuous, twice over.
