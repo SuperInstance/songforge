@@ -102,7 +102,11 @@ def _cleanup_intermediates(stems: dict, enhanced: str) -> None:
     print("  Removed intermediate stems and enhanced vocals (use --keep-stems to retain)")
 
 def _generate_cover(style: str, lyrics: str, output: str) -> str:
-    """Generate cover using MMX."""
+    """Generate cover using MMX.
+
+    Tries plain generation first, then cover mode. Raises RuntimeError if
+    both fail instead of returning a path to a file that was never created.
+    """
     result = subprocess.run([
         "mmx", "music", "generate",
         "--prompt", style,
@@ -111,25 +115,42 @@ def _generate_cover(style: str, lyrics: str, output: str) -> str:
         "--yes", "--quiet", "--non-interactive"
     ], capture_output=True, text=True)
     
+    if result.returncode == 0:
+        return output
+
+    print(f"  MMX generate failed, trying cover mode...")
+    result = subprocess.run([
+        "mmx", "music", "cover",
+        "--audio-file", "enhanced_vocals.wav",
+        "--lyrics", lyrics,
+        "--prompt", style,
+        "--output", output
+    ], capture_output=True, text=True)
+
     if result.returncode != 0:
-        print(f"  MMX generate failed, trying cover mode...")
-        result = subprocess.run([
-            "mmx", "music", "cover",
-            "--audio-file", "enhanced_vocals.wav",
-            "--lyrics", lyrics,
-            "--prompt", style,
-            "--output", output
-        ], capture_output=True, text=True)
-    
+        stderr = (result.stderr or "").strip()[-500:]
+        raise RuntimeError(f"MMX cover generation failed: {stderr}")
     return output
 
 def _mix_tracks(vocals: str, instrumental: str, output: str) -> str:
-    """Mix vocals with instrumental."""
-    subprocess.run([
+    """Mix vocals with instrumental.
+
+    Raises RuntimeError if ffmpeg fails — a silent mix leaves the caller
+    holding a path to a file that was never written.
+    """
+    result = subprocess.run([
         "ffmpeg", "-y",
         "-i", vocals,
         "-i", instrumental,
         "-filter_complex", "amix=inputs=2:duration=longest",
         output
     ], capture_output=True, text=True)
+
+    if result.returncode != 0:
+        stderr = (result.stderr or "").strip()[-500:]
+        raise RuntimeError(f"ffmpeg mix failed: {stderr}")
+
+    out_path = Path(output)
+    if not out_path.is_file():
+        raise RuntimeError(f"ffmpeg mix reported success but produced no file: {output}")
     return output
