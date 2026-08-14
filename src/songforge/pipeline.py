@@ -2,6 +2,7 @@
 SongForge full cover pipeline: Separate → Enhance → Transcribe → Generate → Mix
 """
 
+import shutil
 import subprocess
 from pathlib import Path
 from .separate import separate_stems
@@ -11,6 +12,7 @@ from .analyze import analyze_recording, diagnose_vocal_presence, format_report
 
 def cover_pipeline(args):
     """Run the full cover generation pipeline."""
+    keep_stems = getattr(args, "keep_stems", False)
     print("=" * 60)
     print("SongForge — Cover Pipeline")
     print("=" * 60)
@@ -52,9 +54,52 @@ def cover_pipeline(args):
     # Step 5: Mix
     print("\n[5/5] Mixing cover with instrumental...")
     final = _mix_tracks(cover_file, instrumental, args.output.replace(".mp3", "_mixed.mp3"))
-    
+
+    # Intermediates are only kept when the user asks for them
+    if not keep_stems:
+        _cleanup_intermediates(stems, enhanced)
+
     print(f"\n✅ Cover complete: {final}")
     return final
+
+
+def _cleanup_intermediates(stems: dict, enhanced: str) -> None:
+    """Remove the stems and enhanced vocal wav this pipeline run created.
+
+    Honors the CLI's --keep-stems flag: by default SongForge leaves no
+    intermediate files behind. Only the per-song Demucs output directory
+    (and the model dir if it becomes empty) plus the enhanced wav are
+    removed — sibling song folders are never touched.
+
+    Safety: paths are resolved before removal and anything that resolves
+    to the current working directory or one of its ancestors is refused.
+    This keeps a relative path like "vocals.wav" from ever escalating into
+    deleting the project directory.
+    """
+    cwd = Path.cwd().resolve()
+
+    def _refuse_if_unsafe(resolved: Path, what: str) -> None:
+        if resolved == cwd or cwd.is_relative_to(resolved):
+            raise ValueError(
+                f"Refusing to remove {resolved} ({what}): would delete the working directory"
+            )
+
+    for path in (stems["vocals"], stems["no_vocals"]):
+        song_dir = Path(path).resolve().parent
+        if not song_dir.exists():
+            continue
+        _refuse_if_unsafe(song_dir, "stem dir")
+        shutil.rmtree(song_dir)
+        # Drop the model dir (e.g. htdemucs/) if this was its last song
+        model_dir = song_dir.parent
+        if model_dir.exists() and not any(model_dir.iterdir()):
+            _refuse_if_unsafe(model_dir, "model dir")
+            model_dir.rmdir()
+    enhanced_path = Path(enhanced).resolve()
+    if enhanced_path.is_file():
+        _refuse_if_unsafe(enhanced_path, "enhanced vocal wav")
+        enhanced_path.unlink()
+    print("  Removed intermediate stems and enhanced vocals (use --keep-stems to retain)")
 
 def _generate_cover(style: str, lyrics: str, output: str) -> str:
     """Generate cover using MMX."""

@@ -11,7 +11,7 @@ from pathlib import Path
 from unittest.mock import patch, MagicMock, call
 
 from songforge.cli import main
-from songforge.pipeline import cover_pipeline, _generate_cover, _mix_tracks
+from songforge.pipeline import cover_pipeline, _generate_cover, _mix_tracks, _cleanup_intermediates
 
 
 # ─── CLI: Argument Parsing ───
@@ -206,6 +206,7 @@ class TestCoverPipeline:
         defaults.update(overrides)
         return argparse.Namespace(**defaults)
 
+    @patch("songforge.pipeline._cleanup_intermediates")
     @patch("songforge.pipeline._mix_tracks")
     @patch("songforge.pipeline._generate_cover")
     @patch("songforge.pipeline.transcribe_audio")
@@ -216,7 +217,7 @@ class TestCoverPipeline:
     @patch("songforge.pipeline.analyze_recording")
     def test_full_pipeline_proceed(self, mock_analyze, mock_diagnose, mock_format,
                                     mock_separate, mock_enhance, mock_transcribe,
-                                    mock_generate, mock_mix):
+                                    mock_generate, mock_mix, mock_cleanup):
         """When diagnosis says proceed, full pipeline runs all 5 steps."""
         mock_analyze.return_value = {"duration": 30.0}
         mock_diagnose.return_value = {"recommendation": "proceed"}
@@ -254,6 +255,7 @@ class TestCoverPipeline:
         mock_generate.assert_called_once()
         # Should NOT have called separate_stems etc.
 
+    @patch("songforge.pipeline._cleanup_intermediates")
     @patch("songforge.pipeline._mix_tracks")
     @patch("songforge.pipeline._generate_cover")
     @patch("songforge.pipeline.transcribe_audio")
@@ -264,7 +266,8 @@ class TestCoverPipeline:
     @patch("songforge.pipeline.analyze_recording")
     def test_pipeline_force_overrides_skip(self, mock_analyze, mock_diagnose, mock_format,
                                             mock_separate, mock_enhance,
-                                            mock_transcribe, mock_generate, mock_mix):
+                                            mock_transcribe, mock_generate, mock_mix,
+                                            mock_cleanup):
         """When --force is set, separation runs even if diagnosis says skip."""
         mock_analyze.return_value = {"duration": 30.0}
         mock_diagnose.return_value = {"recommendation": "skip_separation"}
@@ -293,6 +296,109 @@ class TestCoverPipeline:
         args = self._make_args(input="custom.mp3")
         cover_pipeline(args)
         mock_analyze.assert_called_once_with("custom.mp3")
+
+    def test_cleanup_intermediates_removes_created_files(self, tmp_path):
+        """_cleanup_intermediates removes stems, empty model dir, and enhanced wav."""
+        song_dir = tmp_path / "htdemucs" / "song"
+        song_dir.mkdir(parents=True)
+        vocals = song_dir / "vocals.wav"
+        no_vocals = song_dir / "no_vocals.wav"
+        vocals.write_bytes(b"v")
+        no_vocals.write_bytes(b"i")
+        enhanced = tmp_path / "enhanced_vocals.wav"
+        enhanced.write_bytes(b"e")
+
+        stems = {"vocals": str(vocals), "no_vocals": str(no_vocals)}
+        _cleanup_intermediates(stems, str(enhanced))
+
+        assert not song_dir.exists()
+        assert not (tmp_path / "htdemucs").exists()  # emptied model dir is dropped too
+        assert not enhanced.exists()
+
+    def test_cleanup_intermediates_keeps_sibling_songs(self, tmp_path):
+        """Cleanup must not touch other songs in the same model dir."""
+        model_dir = tmp_path / "htdemucs"
+        song_dir = model_dir / "song"
+        song_dir.mkdir(parents=True)
+        sibling = model_dir / "other-song"
+        sibling.mkdir()
+        sibling_file = sibling / "vocals.wav"
+        sibling_file.write_bytes(b"keep")
+
+        stems = {"vocals": str(song_dir / "vocals.wav"), "no_vocals": str(song_dir / "no_vocals.wav")}
+        _cleanup_intermediates(stems, str(tmp_path / "enhanced_vocals.wav"))
+
+        assert not song_dir.exists()
+        assert sibling_file.exists()  # sibling song untouched
+
+    def test_cleanup_intermediates_refuses_working_dir(self, tmp_path, monkeypatch):
+        """Cleanup must refuse paths that resolve to the CWD or its ancestors."""
+        # Point the process CWD at the tmp dir so the guard is exercised for real
+        monkeypatch.chdir(tmp_path)
+        danger = tmp_path / "vocals.wav"  # parent resolves to CWD itself
+        danger.write_bytes(b"v")
+
+        stems = {"vocals": "vocals.wav", "no_vocals": "no_vocals.wav"}
+        with pytest.raises(ValueError, match="Refusing to remove"):
+            _cleanup_intermediates(stems, "enhanced.wav")
+
+        # Nothing got deleted
+        assert danger.exists()
+        assert tmp_path.exists()
+
+    @patch("songforge.pipeline._cleanup_intermediates")
+    @patch("songforge.pipeline._mix_tracks")
+    @patch("songforge.pipeline._generate_cover")
+    @patch("songforge.pipeline.transcribe_audio")
+    @patch("songforge.pipeline.enhance_vocals")
+    @patch("songforge.pipeline.separate_stems")
+    @patch("songforge.pipeline.format_report")
+    @patch("songforge.pipeline.diagnose_vocal_presence")
+    @patch("songforge.pipeline.analyze_recording")
+    def test_pipeline_cleans_up_by_default(self, mock_analyze, mock_diagnose, mock_format,
+                                           mock_separate, mock_enhance, mock_transcribe,
+                                           mock_generate, mock_mix, mock_cleanup):
+        """Without --keep-stems, the pipeline cleans up intermediates."""
+        mock_analyze.return_value = {"duration": 30.0}
+        mock_diagnose.return_value = {"recommendation": "proceed"}
+        mock_format.return_value = "Report"
+        mock_separate.return_value = {"vocals": "vocals.wav", "no_vocals": "instrumental.wav"}
+        mock_enhance.return_value = "enhanced.wav"
+        mock_transcribe.return_value = {"transcription": "la la la"}
+        mock_generate.return_value = "cover.mp3"
+        mock_mix.return_value = "cover_mixed.mp3"
+
+        args = self._make_args(keep_stems=False)
+        cover_pipeline(args)
+
+        mock_cleanup.assert_called_once_with({"vocals": "vocals.wav", "no_vocals": "instrumental.wav"}, "enhanced.wav")
+
+    @patch("songforge.pipeline._cleanup_intermediates")
+    @patch("songforge.pipeline._mix_tracks")
+    @patch("songforge.pipeline._generate_cover")
+    @patch("songforge.pipeline.transcribe_audio")
+    @patch("songforge.pipeline.enhance_vocals")
+    @patch("songforge.pipeline.separate_stems")
+    @patch("songforge.pipeline.format_report")
+    @patch("songforge.pipeline.diagnose_vocal_presence")
+    @patch("songforge.pipeline.analyze_recording")
+    def test_pipeline_keeps_stems_with_flag(self, mock_analyze, mock_diagnose, mock_format,
+                                            mock_separate, mock_enhance, mock_transcribe,
+                                            mock_generate, mock_mix, mock_cleanup):
+        """With --keep-stems, intermediates are left in place."""
+        mock_analyze.return_value = {"duration": 30.0}
+        mock_diagnose.return_value = {"recommendation": "proceed"}
+        mock_format.return_value = "Report"
+        mock_separate.return_value = {"vocals": "vocals.wav", "no_vocals": "instrumental.wav"}
+        mock_enhance.return_value = "enhanced.wav"
+        mock_transcribe.return_value = {"transcription": "la la la"}
+        mock_generate.return_value = "cover.mp3"
+        mock_mix.return_value = "cover_mixed.mp3"
+
+        args = self._make_args(keep_stems=True)
+        cover_pipeline(args)
+
+        mock_cleanup.assert_not_called()
 
 
 # ─── Pipeline: _generate_cover ───
