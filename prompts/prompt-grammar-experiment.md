@@ -24,3 +24,30 @@ Subject: "A loop that has been running for 144 repetitions becomes self-aware an
 - [ ] Generate A, B, C on Aug 16 4:00 PM AKST
 - [ ] Blind scoring
 - [ ] Adopt winner as house grammar
+
+---
+
+# Addendum: Second Subject (Aug 14)
+
+The grammar A/B/C experiment (above) will run on one subject. To avoid a single-subject confound, we add a second subject: **the drifting round**.
+
+Subject 2: "Four voices sing a round; one is slower, so the round drifts apart, and only the slow voice finishes the line alone."
+
+### Grammar A — Terse spec
+> A cappella vocal round about four voices singing the same line; one voice is slower, the round drifts, and only that voice finishes. 72 BPM, F major, gentle, inevitable, solitary ending.
+
+### Grammar B — Sensory narrative
+> Four voices begin the same line one after another, chasing each other around the melody. The slowest voice trails by a little more each pass. The harmony stretches; the parts separate like boats on a widening river. By the end, three voices have finished and gone, and the slow voice is still singing the last phrase alone — not sadly, just inevitably. The drift was always the arrangement.
+
+### Grammar C — Constraint list
+> genre: a cappella vocal round; bpm: 72; key: F major; instruments: four vocal parts, no instruments; mood: gentle, inevitable, solitary at the end; structure: round entries staggered, voices drop out one by one, single sustained final note; avoid: instruments, percussion; extra: one voice noticeably slower, round gradually drifts apart, ends with only that voice.
+
+## Method (updated)
+- Generate A/B/C for both subjects on Aug 16 (6 tracks).
+- Score blind on faithfulness, musical quality, evolution over time, vocal quality.
+- Winner becomes the house grammar; runner-up subject comparison tests grammar-vs-content interaction.
+
+## Status
+- [ ] Generate 6 tracks on Aug 16 4:00 PM AKST
+- [ ] Blind scoring
+- [ ] Adopt winner as house grammar
