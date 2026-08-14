@@ -151,7 +151,7 @@ class TestCLICommandDispatch:
     def test_enhance_dispatches_correctly(self, mock_enh):
         with patch.object(sys, "argv", ["songforge", "enhance", "-i", "v.wav", "-o", "out.wav", "--volume", "4.5", "--denoise"]):
             main()
-        mock_enh.assert_called_once_with("v.wav", "out.wav", 4.5, True)
+        mock_enh.assert_called_once_with("v.wav", "out.wav", 4.5, 2000, True)
 
 
 # ─── CLI: Defaults ───
@@ -185,7 +185,7 @@ class TestCLIDefaults:
     def test_enhance_defaults(self, mock_enh):
         with patch.object(sys, "argv", ["songforge", "enhance", "-i", "v.wav"]):
             main()
-        mock_enh.assert_called_once_with("v.wav", "enhanced.wav", 3.0, False)
+        mock_enh.assert_called_once_with("v.wav", "enhanced.wav", 3.0, 2000, False)
 
 
 # ─── Pipeline: cover_pipeline ───
