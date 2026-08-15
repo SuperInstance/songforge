@@ -251,7 +251,7 @@ spec: name, prompt text, genre, instruments, BPM, key, mood. Examples:
 `the-law-of-endings.json`, `the-mediums-ceiling.json`, `the-damped-aimer.json`,
 `the-exit-ramp.json`, `the-saturation-point.json`, `the-clearance.json`,
 `the-knife-edge.json`, plus the six staged grammar variants
-(`grammar-{a,b,c}-{loop,round}.json`). (51 designs, committed.)
+(`grammar-{a,b,c}-{loop,round}.json`). (54 designs, committed.)
 `prompts/prompt-grammar-experiment.md` documents the grammar study that
 shapes how prompts are written.
 
@@ -262,8 +262,9 @@ to: songforge designs prompts, ai-writings holds the generated corpus
 (`index.json`, 8,485 pieces), and the queue count (154 tracks) is the
 manifest of what Generation Day will produce. The queue itself is a roster,
 not a file in this repo — the repo holds the *designs*, the fleet holds the
-*roster*. (Queue count now 163 tracks: 154 + 6 grammar variants + 3 new
-designs.)
+*roster*. (Queue count now 166 tracks: 154 + 6 grammar variants + 6 new
+designs: saturation-point, clearance, knife-edge, flat-topped-wall,
+sign-is-a-price, different-cast.)
 
 ## Tests
 

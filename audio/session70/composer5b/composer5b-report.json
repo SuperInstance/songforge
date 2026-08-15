@@ -1,0 +1,38 @@
+{
+ "h0": {
+  "corr": 0.523,
+  "read": "BUMP",
+  "placed": "DIP",
+  "match": false,
+  "depth": 8.0,
+  "bump": -13.2,
+  "dip_err": -0.123,
+  "bump_err": 0.127,
+  "address": 242.888,
+  "holes": 3
+ },
+ "h1": {
+  "corr": 0.45,
+  "read": "BUMP",
+  "placed": "DIP",
+  "match": false,
+  "depth": 14.3,
+  "bump": -12.3,
+  "dip_err": -0.121,
+  "bump_err": -0.321,
+  "address": 483.926,
+  "holes": 4
+ },
+ "h2": {
+  "corr": 0.045,
+  "read": "BUMP",
+  "placed": "DIP",
+  "match": false,
+  "depth": 7.8,
+  "bump": -10.6,
+  "dip_err": 0.083,
+  "bump_err": 0.183,
+  "address": 721.965,
+  "holes": 5
+ }
+}
