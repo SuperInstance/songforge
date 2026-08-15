@@ -98,6 +98,9 @@ across sessions 63-66:
 | `refine_resonance.py` | S66 refinement: FFT period of the std-vs-X curve (both depths) + envelope-correlation prediction replacing the failed pause test | `python3 experiments/refine_resonance.py <s64_dir> <s65_dir> <s66_dir>` |
 | `session67_build.py` | S67 build: depth-4 relays + frozen-clock targeted sweep + chosen-X (analyzer-as-composer) relays | `python3 experiments/session67_build.py <s66_dir> <out_dir>` |
 | `session67_analyze.py` | S67 analysis: depth-4 tax/crowd/fairness + frozen-clock teeth + composer placement test | `python3 experiments/session67_analyze.py <s64> <s65> <s66> <s67>` |
+| `session68_census.py` | S68 build+analyze: N=8 census (fwd/rev/interval-5) + f32 no-clip twin — veq → N exactly, container tax curve | `python3 experiments/session68_census.py <s66_dir> <out_dir>` |
+| `session68_composer.py` | S68 v2 aiming loop (gain 2, ±2 s argmin measurement) — the loop rings, chases ghosts | `python3 experiments/session68_composer.py <s66_dir> <out_dir>` |
+| `session68_aim3.py` | S68 v3 damped aimer (gain 0.5, predicted-center measurement, ghost reporting) + medium's ceiling curve (N=2/4/8, s16 vs f32) | `python3 experiments/session68_aim3.py <s66_dir> <out_dir>` |
 | `morph_sweep.py` | S65: sweep X over the relay, watch the morph → tax curve with resonance teeth | see file docstring |
 | `analyze_conservation.py` | Shared wav reader + windowed power profiles; the analysis workhorse | imported by the others |
 | `generate_lyrics.sh` | Generate lyrics from a local ollama model at temperature T (S64 path-fix: reads prompt files instead of their paths) | `./generate_lyrics.sh <model> <temp> <outfile> [prompt]` |
@@ -105,6 +108,36 @@ across sessions 63-66:
 Audio corpus lives in `audio/sessionNN/` (gitignored — regenerable with the
 build tools). Readable artifacts — the lyric transcripts — live in
 `lyrics/sessionNN/` and are committed.
+
+## Session 68 findings (2026-08-15, morning)
+
+The census is exact, the aimer rings (then converges), and the medium has a
+ceiling curve.
+
+- **veq → N exactly, in float32.** N=2/4/8 staircases of the same layer-3
+  cast: veq 2.010 / 4.025 / **8.066** — the census law is arithmetic. The
+  0.5–0.8% overshoot is the self-correlation bonus (identical material added
+  to itself correlates; cross-terms are positive).
+- **The medium's ceiling is a curve, monotone in N.** Container tax (s16
+  energy ÷ f32 energy): 0.9976 → 0.9920 → **0.9738**. The s16 container
+  takes 2.6% of an 8-voice census vs 0.24% at N=2. The "ceiling is the cast"
+  (S67) needs its amendment: the cast sets the census, the container levies
+  the tax, and the tax grows with the crowd.
+- **The census fate is the frozen clock exiting.** N=8 fairness delta 1.45 dB
+  is NOT entry order (both orders negative; a census enters everyone at
+  once). The 10% tail window catches the exit ramp, staggered by cast
+  durations — the two census files differ by exactly the 2.1 s birthmark
+  (250.39 vs 252.49 s). The clock walks out through the exit ramp.
+- **The aimer rings at gain 2.** v2 loop: +0.69 → −1.62 → −0.47 s, a limit
+  cycle pinned against the X=5.5 wall; the ±2 s argmin sometimes measures
+  the inherited fade-rim ghost (72.8 dB) instead of the placed seam.
+- **The damped aimer converges.** v3 (gain 0.5, measure at the predicted
+  center anchor − X/2, report the ghost separately): handoff 0 lands at a
+  −65 ms fixed point in one round, 12–15 dB deep. Handoff 2 stays shallow
+  (≈0 dB): position is free, depth is rented — the material lends only what
+  its correlation at that width allows.
+- **The pre-screen floor was wrong.** v2 scanned from X=0.30 and saturated
+  there; v3's true floor is X=0.25 for all three handoffs (max|corr| 0.85–0.88).
 
 ## Session 67 findings (2026-08-14, evening)
 
@@ -168,7 +201,9 @@ spec: name, prompt text, genre, instruments, BPM, key, mood. Examples:
 `conservation-of-signal.json`, `the-transmission-tax.json`,
 `the-crowd-ceiling.json`, `the-fixed-point.json`, `the-frozen-clock.json`,
 `the-forgiving-machine.json`, `the-manufactured-silence.json`,
-`the-ceiling-is-the-cast.json`. (36 designs, committed.)
+`the-ceiling-is-the-cast.json`, `the-census.json`, `the-aiming-composer.json`,
+`the-law-of-endings.json`, `the-mediums-ceiling.json`, `the-damped-aimer.json`,
+`the-exit-ramp.json`. (42 designs, committed.)
 `prompts/prompt-grammar-experiment.md` documents the grammar study that
 shapes how prompts are written.
 
@@ -176,7 +211,7 @@ The **track queue** is the fleet-level roster of songs to generate on the
 next Generation Day — a scheduled batch run (e.g. Aug 16 2026, 4 PM AKST).
 "Fleet" here means the multi-agent writing/music system this repo belongs
 to: songforge designs prompts, ai-writings holds the generated corpus
-(`index.json`, 8,485 pieces), and the queue count (148 tracks) is the
+(`index.json`, 8,485 pieces), and the queue count (154 tracks) is the
 manifest of what Generation Day will produce. The queue itself is a roster,
 not a file in this repo — the repo holds the *designs*, the fleet holds the
 *roster*.
