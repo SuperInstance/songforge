@@ -92,10 +92,12 @@ across sessions 63-66:
 
 | Tool | What it does | Run it |
 |------|--------------|--------|
-| `build_relay.py` | Build a relay round (chain) or staircase (crowd control) from a voice dir (must contain `lessac/norman/joe/amy.wav`) | `python3 experiments/build_relay.py <voice_dir> <out_dir> [--x 1.0]` |
+| `build_relay.py` | Build a relay round (chain) or staircase (crowd control) from a voice dir (must contain `lessac/norman/joe/amy.wav`); `build_relay_vx()` supports per-handoff crossfade widths | `python3 experiments/build_relay.py <voice_dir> <out_dir> [--x 1.0]` |
 | `depth3_relay.py` | S66 build: relay-of-relays-of-relays (depth 3) + depth-2 resonance sweep (X 0→5.5 s step 0.25) | `python3 experiments/depth3_relay.py <session65_dir> <out_root>` |
 | `analyze_depth3.py` | S66 analysis: tax series across depths 1→3, resonance teeth (std/energy/silence), pause-structure prediction test | `python3 experiments/analyze_depth3.py <s64_dir> <s65_dir> <s66_dir>` |
 | `refine_resonance.py` | S66 refinement: FFT period of the std-vs-X curve (both depths) + envelope-correlation prediction replacing the failed pause test | `python3 experiments/refine_resonance.py <s64_dir> <s65_dir> <s66_dir>` |
+| `session67_build.py` | S67 build: depth-4 relays + frozen-clock targeted sweep + chosen-X (analyzer-as-composer) relays | `python3 experiments/session67_build.py <s66_dir> <out_dir>` |
+| `session67_analyze.py` | S67 analysis: depth-4 tax/crowd/fairness + frozen-clock teeth + composer placement test | `python3 experiments/session67_analyze.py <s64> <s65> <s66> <s67>` |
 | `morph_sweep.py` | S65: sweep X over the relay, watch the morph → tax curve with resonance teeth | see file docstring |
 | `analyze_conservation.py` | Shared wav reader + windowed power profiles; the analysis workhorse | imported by the others |
 | `generate_lyrics.sh` | Generate lyrics from a local ollama model at temperature T (S64 path-fix: reads prompt files instead of their paths) | `./generate_lyrics.sh <model> <temp> <outfile> [prompt]` |
@@ -103,6 +105,32 @@ across sessions 63-66:
 Audio corpus lives in `audio/sessionNN/` (gitignored — regenerable with the
 build tools). Readable artifacts — the lyric transcripts — live in
 `lyrics/sessionNN/` and are committed.
+
+## Session 67 findings (2026-08-14, evening)
+
+Depth 4 (256 voices, ~960 s), the frozen clock, and the analyzer-as-composer.
+
+- **The tax holds at one.** Depth-4 tax: 0.9999 / 0.9988 / 0.9962
+  (X = 0.3 / 1.0 / 2.0). Deficit compounding factor ≈ 0.29 (X=2.0),
+  matching the ~0.25/layer prediction.
+- **The crowd ceiling is refuted — the ceiling is the cast.** Crowd veq
+  series 2.02 → 3.14 → 3.40 → **3.99**: a staircase of N long voices
+  approaches N·E_single; the "saturation" was the entry-ramp fraction.
+  Togetherness is bounded by a census.
+- **The fate amortizes, it is not a fixed point.** With proportional
+  (10%-of-file) tail windows the entry-order delta runs 3.23 → 0.73 →
+  0.07 → 0.10 dB across depths 1→4. The S64–S66 half-decibel "fate" was
+  a fixed-window artifact. Twin asymptotes: tax → 1, fate → 0.
+- **The frozen clock.** A composed file lasts Σdur − 3X, so cast duration
+  differences (2.1 / 3.0 / 5.1 s) survive every recursion unchanged — the
+  internal clock is made of crossfades. Depth-4 sweep rings at the depth-2
+  addresses (dip 3.25, std tooth 3.25 / 5.25).
+- **The analyzer composes.** Per-handoff chosen-X relays: correlation
+  minima place handoff dips 13–17 dB below body; maxima place humps
+  (+1.5/+2.6 dB); the zero-correlation "control" lands at −41.6 dB —
+  zero is not neutral, it is empty. The placed silences are manufactured:
+  composed files carry inherited fade-rims (−81 to −92 dB tails) the raw
+  voices never had.
 
 ## Session 66 findings (2026-08-14)
 
@@ -138,7 +166,9 @@ transmission tax asymptote?**
 Prompts live in `prompts/*.json` — one file per song design, each a full
 spec: name, prompt text, genre, instruments, BPM, key, mood. Examples:
 `conservation-of-signal.json`, `the-transmission-tax.json`,
-`the-crowd-ceiling.json`, `the-fixed-point.json`. (31 designs, committed.)
+`the-crowd-ceiling.json`, `the-fixed-point.json`, `the-frozen-clock.json`,
+`the-forgiving-machine.json`, `the-manufactured-silence.json`,
+`the-ceiling-is-the-cast.json`. (36 designs, committed.)
 `prompts/prompt-grammar-experiment.md` documents the grammar study that
 shapes how prompts are written.
 
@@ -146,7 +176,7 @@ The **track queue** is the fleet-level roster of songs to generate on the
 next Generation Day — a scheduled batch run (e.g. Aug 16 2026, 4 PM AKST).
 "Fleet" here means the multi-agent writing/music system this repo belongs
 to: songforge designs prompts, ai-writings holds the generated corpus
-(`index.json`, 8,485 pieces), and the queue count (144 tracks) is the
+(`index.json`, 8,485 pieces), and the queue count (148 tracks) is the
 manifest of what Generation Day will produce. The queue itself is a roster,
 not a file in this repo — the repo holds the *designs*, the fleet holds the
 *roster*.

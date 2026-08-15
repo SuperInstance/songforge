@@ -109,6 +109,59 @@ def build_relay(voices, out, x):
     print(f"relay: {out}  total={total:.2f}s  starts={[round(s,2) for s in starts]}")
 
 
+def build_relay_vx(voices, out, xs):
+    """Relay where handoff i uses crossfade duration xs[i] (chosen per pair).
+
+    The composer version: xs come from the analyzer (envelope-correlation
+    teeth per handoff), not from a uniform sweep.
+    """
+    assert len(xs) == len(voices) - 1, "one X per handoff"
+    durs = [probe_duration(v) for v in voices]
+    starts = [0.0]
+    for i in range(len(voices) - 1):
+        starts.append(starts[i] + durs[i] - xs[i])
+    total = starts[-1] + durs[-1]
+    probe = subprocess.run(
+        ["ffprobe", "-v", "error", "-select_streams", "a:0",
+         "-show_entries", "stream=sample_rate", "-of", "csv=p=0", voices[0]],
+        capture_output=True, text=True)
+    sr = int(probe.stdout.strip())
+
+    import numpy as np
+    n = int(total * sr) + 1
+    mix = np.zeros(n, dtype=np.float64)
+
+    def read(path):
+        out = subprocess.run(
+            ["ffmpeg", "-v", "error", "-i", path, "-f", "f32le", "-ac", "1",
+             "-"], capture_output=True)
+        return np.frombuffer(out.stdout, dtype=np.float32).astype(np.float64)
+
+    datas = [read(v) for v in voices]
+    for i, data in enumerate(datas):
+        s = int(starts[i] * sr)
+        e = s + len(data)
+        g = np.ones(e - s, dtype=np.float64)
+        x_in = xs[i - 1] if i > 0 else 0.0      # fade-in from previous handoff
+        x_out = xs[i] if i < len(voices) - 1 else 0.0  # fade-out to next
+        xi = int(x_in * sr)
+        xo = int(x_out * sr)
+        if xi > 0:
+            g[:xi] = np.sin(np.linspace(0, np.pi / 2, xi))
+        if xo > 0:
+            g[-xo:] = np.sin(np.linspace(np.pi / 2, 0, xo))
+        mix[s:e] += data * g
+
+    peak = np.abs(mix).max()
+    if peak > 0:
+        mix = mix * (0.98 / peak)
+    pcm = (mix * 32767).astype(np.int16)
+    subprocess.run(
+        ["ffmpeg", "-y", "-f", "s16le", "-ar", str(sr), "-ac", "1", "-i",
+         "-", out], input=pcm.tobytes(), capture_output=True)
+    print(f"relay-vx: {out}  total={total:.2f}s  xs={[round(x,2) for x in xs]}")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("voice_dir")
