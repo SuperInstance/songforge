@@ -1,0 +1,15 @@
+{
+ "name": "grammar-c-loop",
+ "prompt": "genre: minimalist electronic pop; bpm: 100; key: C minor; instruments: analog synth, drum machine, reverb; mood: introspective, evolving; structure: intro-verse-chorus-verse-chorus-outro; avoid: vocals, distortion; references: early synth-pop; extra: gradual evolution across repetitions, ending with a single sustained tone",
+ "genre": "minimalist electronic pop",
+ "instruments": "analog synth, drum machine, reverb",
+ "bpm": 100,
+ "key": "C minor",
+ "mood": "introspective, evolving",
+ "structure": "intro-verse-chorus-verse-chorus-outro",
+ "avoid": "vocals, distortion",
+ "references": "early synth-pop",
+ "extra": "gradual evolution across repetitions, ending with a single sustained tone",
+ "grammar": "C",
+ "subject": "the self-aware loop (144 repetitions)"
+}

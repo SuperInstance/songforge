@@ -101,6 +101,10 @@ across sessions 63-66:
 | `session68_census.py` | S68 build+analyze: N=8 census (fwd/rev/interval-5) + f32 no-clip twin — veq → N exactly, container tax curve | `python3 experiments/session68_census.py <s66_dir> <out_dir>` |
 | `session68_composer.py` | S68 v2 aiming loop (gain 2, ±2 s argmin measurement) — the loop rings, chases ghosts | `python3 experiments/session68_composer.py <s66_dir> <out_dir>` |
 | `session68_aim3.py` | S68 v3 damped aimer (gain 0.5, predicted-center measurement, ghost reporting) + medium's ceiling curve (N=2/4/8, s16 vs f32) | `python3 experiments/session68_aim3.py <s66_dir> <out_dir>` |
+| `session69_taxcurve.py` | S69: container-tax curve to N=32 (s16 vs f32 twins, clip & flat-top fractions, census-dividend fit) — the tax is monotone, the dividend flips negative | `python3 experiments/session69_taxcurve.py <s66_dir> <out_dir>` |
+| `session69_aim4.py` | S69 v4 rental market: measured depth(X) per handoff (grid builds) + joint optimizer (naive meter — ghost-contaminated by design, see report) | `python3 experiments/session69_aim4.py <s66_dir> <out_dir>` |
+| `session69_rental2.py` | S69 ghost-proof meter (sample-exact indexing, either-source-silent exclusion) — the honest rental curves + hump aimer | `python3 experiments/session69_rental2.py <s66_dir> <aim4_dir>` |
+| `session69_verify.py` | S69 clearance verification: market-clearing relay (X*=0.25 on targeted handoffs) — dip & bump at the same address, <50 ms | `python3 experiments/session69_verify.py <s66_dir> <out_dir>` |
 | `morph_sweep.py` | S65: sweep X over the relay, watch the morph → tax curve with resonance teeth | see file docstring |
 | `analyze_conservation.py` | Shared wav reader + windowed power profiles; the analysis workhorse | imported by the others |
 | `generate_lyrics.sh` | Generate lyrics from a local ollama model at temperature T (S64 path-fix: reads prompt files instead of their paths) | `./generate_lyrics.sh <model> <temp> <outfile> [prompt]` |
@@ -108,6 +112,48 @@ across sessions 63-66:
 Audio corpus lives in `audio/sessionNN/` (gitignored — regenerable with the
 build tools). Readable artifacts — the lyric transcripts — live in
 `lyrics/sessionNN/` and are committed.
+
+## Session 69 findings (2026-08-15, morning)
+
+The tax rate card is monotone, the census undercounts itself, and the
+rental market clears at the tightest fade.
+
+- **The container tax is monotone to N=32.** 0.9997 (N=1) → 0.9976 (2) →
+  0.9920 (4) → 0.9738 (8) → 0.9164 (16) → **0.7864 (32)**. At N=32 the s16
+  medium keeps only 78.6% of the census energy and records **24.85 of the
+  31.60 voices actually present**; one sample in ten is a flat-topped rail
+  (clip fraction = flat-top fraction: every clipped sample pins on the rail).
+- **The census dividend flips sign.** Self-correlation bonus (veq_f32 − N):
+  +0.010 → +0.0255 → +0.0657 (N=2/4/8, fit a·N^b, a=0.0045, b=1.273) → ~0
+  (N=16) → **−0.403 (N=32)**. The crowd of identical voices undercounts
+  itself when the twin lags multiply and their autocorrelation sums
+  negative — a real deficit, not noise.
+- **The rental market is ghost-contaminated when naively metered.** Local
+  min in a ±0.45 s band prices X=1.0 at 70–82 dB for every handoff — the
+  inherited fade-rims (S67) inside the band. The ghost is a price-setter:
+  60 dB of the "prime lot" was inherited silence. Meter fixes: sample-exact
+  window indexing (the (k+0.5)·ws mapping drifts 0.33 s over 14k windows),
+  and exclude windows where EITHER source is below body − 45 dB — a seam
+  cannot be placed where the material is already silent.
+- **The honest market clears at X=0.25 for all three handoffs.** Depth
+  26.5 / 31.9 / 31.3 dB, position error −49 / −46 / −42 ms. The tightest
+  crossfade is the deepest seam AND the truest address. X=1.0 reprices to
+  8–14 dB; jagged second-price pockets (h2 at X=3.0: 28.6 dB) are the
+  resonance teeth in the price list.
+- **The clearance law (v4): X is the only dial.** It sets the address
+  (anchor − X/2), the depth, and the sign of the feature. The joint
+  optimizer's phantom +3.7 s error was a stale target — the seam landed
+  exactly where the rented X says it lands.
+- **The hump aimer works.** At X=0.25, handoff 1 rents a +24 dB bump and
+  handoff 2 a +31 dB bump — a knife-edge address (31 dB dip AND bump in the
+  same 60 ms). Handoff 0 stays anti-correlated. Verification build:
+  dip@−49 ms / 26.5 dB and dip@−42 ms / 31.3 dB + bump — the deepest,
+  tightest, most honest placement in the relay series.
+- **Lyrics, temperatures, models:** 10 new lyric drafts for the three new
+  prompts across llama3.2 / qwen2.5:3b / phi3 / granite3.1-dense at
+  t0.5/0.8/1.1 — llama3.2 delivers full verse-chorus-bridge at both ends of
+  the temperature range; phi3 rambles (6600 words), consistent with its
+  established voice.
 
 ## Session 68 findings (2026-08-15, morning)
 
@@ -203,7 +249,9 @@ spec: name, prompt text, genre, instruments, BPM, key, mood. Examples:
 `the-forgiving-machine.json`, `the-manufactured-silence.json`,
 `the-ceiling-is-the-cast.json`, `the-census.json`, `the-aiming-composer.json`,
 `the-law-of-endings.json`, `the-mediums-ceiling.json`, `the-damped-aimer.json`,
-`the-exit-ramp.json`. (42 designs, committed.)
+`the-exit-ramp.json`, `the-saturation-point.json`, `the-clearance.json`,
+`the-knife-edge.json`, plus the six staged grammar variants
+(`grammar-{a,b,c}-{loop,round}.json`). (51 designs, committed.)
 `prompts/prompt-grammar-experiment.md` documents the grammar study that
 shapes how prompts are written.
 
@@ -214,7 +262,8 @@ to: songforge designs prompts, ai-writings holds the generated corpus
 (`index.json`, 8,485 pieces), and the queue count (154 tracks) is the
 manifest of what Generation Day will produce. The queue itself is a roster,
 not a file in this repo — the repo holds the *designs*, the fleet holds the
-*roster*.
+*roster*. (Queue count now 163 tracks: 154 + 6 grammar variants + 3 new
+designs.)
 
 ## Tests
 

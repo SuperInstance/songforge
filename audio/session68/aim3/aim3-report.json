@@ -1,0 +1,125 @@
+{
+ "targets": {
+  "round0": {
+   "xs": [
+    3.064,
+    1.0,
+    4.374
+   ]
+  },
+  "round1": {
+   "xs": [
+    3.031,
+    1.0,
+    4.226
+   ]
+  },
+  "round2": {
+   "xs": [
+    2.999,
+    1.0,
+    4.379
+   ]
+  },
+  "round3": {
+   "xs": [
+    2.966,
+    1.0,
+    4.281
+   ]
+  }
+ },
+ "prescreen": [
+  {
+   "handoff": 0,
+   "max_abs_corr": 0.8508269786834717,
+   "corr_min": -0.8508269786834717,
+   "x_at_corr_min": 0.25
+  },
+  {
+   "handoff": 1,
+   "max_abs_corr": 0.882851779460907,
+   "corr_min": -0.882851779460907,
+   "x_at_corr_min": 0.25
+  },
+  {
+   "handoff": 2,
+   "max_abs_corr": 0.877655029296875,
+   "corr_min": -0.877655029296875,
+   "x_at_corr_min": 0.25
+  }
+ ],
+ "ghosts": {
+  "0": {
+   "h0": {
+    "x": 3.196,
+    "placed_err": -0.265,
+    "placed_depth": 12.4,
+    "ghost_depth": 72.8
+   },
+   "h2": {
+    "x": 4.396,
+    "placed_err": -0.395,
+    "placed_depth": 0.9,
+    "ghost_depth": 18.0
+   }
+  },
+  "1": {
+   "h0": {
+    "x": 3.064,
+    "placed_err": -0.065,
+    "placed_depth": 13.1,
+    "ghost_depth": 44.1
+   },
+   "h2": {
+    "x": 4.374,
+    "placed_err": -0.295,
+    "placed_depth": -1.2,
+    "ghost_depth": 47.2
+   }
+  },
+  "2": {
+   "h0": {
+    "x": 3.031,
+    "placed_err": -0.065,
+    "placed_depth": 14.9,
+    "ghost_depth": 44.1
+   },
+   "h2": {
+    "x": 4.226,
+    "placed_err": 0.305,
+    "placed_depth": -0.5,
+    "ghost_depth": 46.9
+   }
+  },
+  "3": {
+   "h0": {
+    "x": 2.999,
+    "placed_err": -0.065,
+    "placed_depth": 12.0,
+    "ghost_depth": 44.1
+   },
+   "h2": {
+    "x": 4.379,
+    "placed_err": -0.195,
+    "placed_depth": 0.1,
+    "ghost_depth": 47.0
+   }
+  }
+ },
+ "tax-N2": {
+  "veq_s16": 2.0052125453948975,
+  "veq_f32": 2.010021924972534,
+  "container_tax": 0.9976072311401367
+ },
+ "tax-N4": {
+  "veq_s16": 3.9934823513031006,
+  "veq_f32": 4.025493621826172,
+  "container_tax": 0.992047905921936
+ },
+ "tax-N8": {
+  "veq_s16": 7.854718208312988,
+  "veq_f32": 8.065657615661621,
+  "container_tax": 0.9738472700119019
+ }
+}

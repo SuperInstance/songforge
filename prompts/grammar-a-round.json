@@ -1,0 +1,14 @@
+{
+ "name": "grammar-a-round",
+ "prompt": "A cappella vocal round about four voices singing the same line; one voice is slower, the round drifts, and only that voice finishes. 72 BPM, F major, gentle, inevitable, solitary ending.",
+ "genre": "a cappella vocal round",
+ "instruments": "four vocal parts, no instruments",
+ "bpm": 72,
+ "key": "F major",
+ "mood": "gentle, inevitable, solitary at the end",
+ "structure": "round entries staggered, voices drop out one by one, single sustained final note",
+ "avoid": "instruments, percussion",
+ "extra": "one voice noticeably slower, round gradually drifts apart, ends with only that voice",
+ "grammar": "A",
+ "subject": "the drifting round"
+}

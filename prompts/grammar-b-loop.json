@@ -1,0 +1,15 @@
+{
+ "name": "grammar-b-loop",
+ "prompt": "Cold analog synths meet warm reverb. The drone begins to listen. The arpeggio begins to respond. The kick begins to breathe. A four-bar pattern in C minor develops self-awareness through 144 repetitions, each pass adding a small change, until the loop knows it is a loop.",
+ "genre": "minimalist electronic pop",
+ "instruments": "analog synth, drum machine, reverb",
+ "bpm": 100,
+ "key": "C minor",
+ "mood": "introspective, evolving",
+ "structure": "intro-verse-chorus-verse-chorus-outro",
+ "avoid": "vocals, distortion",
+ "references": "early synth-pop",
+ "extra": "gradual evolution across repetitions, ending with a single sustained tone",
+ "grammar": "B",
+ "subject": "the self-aware loop (144 repetitions)"
+}

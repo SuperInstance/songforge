@@ -1,0 +1,15 @@
+{
+ "name": "grammar-a-loop",
+ "prompt": "Minimalist electronic pop about a loop that becomes self-aware. 100 BPM, C minor, analog synth, drum machine, reverb. Introspective.",
+ "genre": "minimalist electronic pop",
+ "instruments": "analog synth, drum machine, reverb",
+ "bpm": 100,
+ "key": "C minor",
+ "mood": "introspective",
+ "structure": "intro-verse-chorus-verse-chorus-outro",
+ "avoid": "vocals, distortion",
+ "references": "early synth-pop",
+ "extra": "gradual evolution across repetitions, ending with a single sustained tone",
+ "grammar": "A",
+ "subject": "the self-aware loop (144 repetitions)"
+}
