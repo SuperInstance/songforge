@@ -4,7 +4,7 @@
 
 1. Clone the repo
 2. Install dependencies
-3. Run tests: `npm test` or `pytest`
+3. Run tests: `python -m pytest`
 
 ## Guidelines
 
