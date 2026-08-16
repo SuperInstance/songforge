@@ -255,16 +255,18 @@ spec: name, prompt text, genre, instruments, BPM, key, mood. Examples:
 `prompts/prompt-grammar-experiment.md` documents the grammar study that
 shapes how prompts are written.
 
-The **track queue** is the fleet-level roster of songs to generate on the
-next Generation Day — a scheduled batch run (e.g. Aug 16 2026, 4 PM AKST).
-"Fleet" here means the multi-agent writing/music system this repo belongs
-to: songforge designs prompts, ai-writings holds the generated corpus
-(`index.json`, 8,485 pieces), and the queue count (154 tracks) is the
-manifest of what Generation Day will produce. The queue itself is a roster,
-not a file in this repo — the repo holds the *designs*, the fleet holds the
-*roster*. (Queue count now 166 tracks: 154 + 6 grammar variants + 6 new
-designs: saturation-point, clearance, knife-edge, flat-topped-wall,
-sign-is-a-price, different-cast.)
+The **track queue is RETIRED** (2026-08-16). Generation Day batch
+generation is cancelled — credits are scarce and the roster deserved better
+than a burn-down. The designs are now **documented as possible songs** in the
+Compass Head Radio Hour **Song Factory** index:
+
+> `ai-writings/radio-theater/compass-head-radio-hour/song-factory/`
+> Live at `luciddreamer.ai/compass-head/song-factory/`
+
+Every design has a render-ready `spec.md` (verbatim prompt + full spec) and an
+art-piece `story.md` (how it came to be). Songs get rendered one at a time, by
+choice, when chosen — not in batches. Historical queue counts (136 at S63,
+166 by S70) referred to the fleet-level roster that this index replaces.
 
 ## Tests
 
