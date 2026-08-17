@@ -1,0 +1,12 @@
+{
+  "name": "the-last-honest-price",
+  "genre": "minimalist folk ballad",
+  "instruments": "single acoustic guitar, close-mic'd, one voice",
+  "bpm": 72,
+  "key": "D minor",
+  "mood": "somber, exact, quietly resolute",
+  "prompt": "A folk ballad about the last honest price in a marketplace of signs. A composer learns that every seam can be read before it is built, but only at the tightest width — the narrow window where the meter sees the actual transition instead of the settled bodies on either side. Wide windows read the bodies and call them seams; they predict peaks where the material builds holes. The sign is a price, the width is the coin, and only the tightest coin buys the truth. The crossing where the correlation changes sign is the last honest price: below it you can buy a dip, above it the seller advertises bumps that never arrive. Verse-chorus structure; the chorus repeats the phrase 'the crossing is the last honest price' like a held note. Quiet fingerpicking, no drums, no strings, the voice close and dry, as if confessing a law of markets to the only other person in the room.",
+  "structure": "verse-chorus-verse-chorus-bridge-chorus",
+  "avoid": "strings, drums, reverb, backing vocals",
+  "lyrics_hook": "The crossing is the last honest price"
+}

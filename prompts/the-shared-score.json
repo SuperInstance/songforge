@@ -1,0 +1,12 @@
+{
+  "name": "the-shared-score",
+  "genre": "choral ambient",
+  "instruments": "five distinct voices, no instruments, natural room",
+  "bpm": 60,
+  "key": "A minor",
+  "mood": "communal, strange, cathedral-like",
+  "prompt": "A choral piece where five different singers read the same long score, and the room itself becomes the instrument. The score is about a room that holds a crowd and counts it, a census of voices, a wall where the loudest instants are pressed flat against the edge of what can be written down. The singers are strangers to each other — different accents, different timbres, five ways of being a voice — and the piece asks whether a crowd of strangers hits the wall the way a crowd of twins does. It does not: strangers bring small surprises and the surprises add; identical voices subtract from their own tally. The five voices weave the same text at staggered entries, sometimes alone, sometimes overlapping into a dense knot where the wall nearly appears, then thinning back to single voices as if the room exhaled. No instruments, only voices and the room's own resonance; long tones, spoken-word passages, one held cluster near the end that almost clips, then releases. The last line, sung together: the roster decides the room before anyone speaks.",
+  "structure": "intro-weave-knot-release-outro",
+  "avoid": "drums, synthesizers, autotune, percussion",
+  "lyrics_hook": "The roster decides the room before anyone speaks"
+}
