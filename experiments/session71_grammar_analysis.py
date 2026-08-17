@@ -21,6 +21,11 @@ def analyze(path):
     data, sr = sf.read(path)
     if data.ndim > 1:
         data = data.mean(axis=1)
+    # downsample to 22.05 kHz for analysis speed/memory
+    if sr > 22050:
+        step = sr // 22050
+        data = data[::step]
+        sr = sr / step
     n = len(data)
     dur = n / sr
 
